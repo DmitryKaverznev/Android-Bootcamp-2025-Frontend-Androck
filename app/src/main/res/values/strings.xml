@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Android-Bootcamp-2025-Frontend</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="button_lookForCentres">Посмотреть ближайшие волонтерские центры</string>
+    <string name="text_searchForCenters">найти центр</string>
+
 </resources>
