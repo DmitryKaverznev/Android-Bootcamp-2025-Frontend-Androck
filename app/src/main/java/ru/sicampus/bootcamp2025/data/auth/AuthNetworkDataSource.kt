@@ -3,13 +3,16 @@ package ru.sicampus.bootcamp2025.data.auth
 import android.util.Log
 import io.ktor.client.call.body
 import io.ktor.client.request.get
+import io.ktor.client.request.headers
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.Credentials
 import ru.sicampus.bootcamp2025.data.Network
 import ru.sicampus.bootcamp2025.data.Network.SERVER_ADDRESS
 
@@ -18,8 +21,12 @@ object AuthNetworkDataSource {
 
     suspend fun isUserExist(login: String): Result<Boolean> = withContext(Dispatchers.IO) {
         runCatching {
-            val response = Network.client.get("$SERVER_ADDRESS/api/username/$login")
+            val response = Network.client.get("$SERVER_ADDRESS/api/users/username/$login")
             Log.e("INFO","response: \"$SERVER_ADDRESS/api/username/$login\"")
+
+            Log.e("AUTH", "Status: ${response.status}")
+            Log.e("AUTH", "Body: ${response.body<String>()}")
+
             response.status == HttpStatusCode.OK
         }
     }
@@ -29,7 +36,16 @@ object AuthNetworkDataSource {
             val response = Network.client.get("$SERVER_ADDRESS/api/users/login") {
                 contentType(ContentType.Application.Json)
                 setBody(LoginRequestDto(login, password))
+                headers {
+                    append(
+                        HttpHeaders.Authorization,
+                        Credentials.basic("vol_vol", "admin")
+                    )
+                }
             }
+
+            Log.e("AUTH", "Status: ${response.status}")
+            Log.e("AUTH", "Body: ${response.body<String>()}")
 
             if (response.status != HttpStatusCode.OK) {
                 error("Status ${response.status}: ${response.body<String>()}")
@@ -37,11 +53,10 @@ object AuthNetworkDataSource {
             Unit
         }
     }
-
     suspend fun register(login: String, password: String, name: String, email: String): Result<Unit> =
         withContext(Dispatchers.IO) {
             runCatching {
-                val response = Network.client.post("$SERVER_ADDRESS/api/users/register") {
+                val response = Network.client.get("$SERVER_ADDRESS/api/users/register") {
                     contentType(ContentType.Application.Json)
                     setBody(
                         AuthRegisterDto(
@@ -56,6 +71,10 @@ object AuthNetworkDataSource {
                 if (response.status != HttpStatusCode.Created) {
                     error("Status ${response.status}: ${response.body<String>()}")
                 }
+
+                Log.e("AUTH", "Status: ${response.status}")
+                Log.e("AUTH", "Body: ${response.body<String>()}")
+
                 Unit
             }
         }

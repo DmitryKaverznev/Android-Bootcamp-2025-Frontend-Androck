@@ -6,11 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import ru.sicampus.bootcamp2025.domain.auth.IsUserExistUseCase
 import ru.sicampus.bootcamp2025.domain.auth.LoginUseCase
@@ -23,7 +20,6 @@ import ru.sicampus.bootcamp2025.domain.auth.AutoLoginUseCase
 import ru.sicampus.bootcamp2025.utils.toReadableMessage
 import kotlin.reflect.KClass
 
-
 class AuthViewModel(
     application: Application,
     private val isUserExistUseCase: IsUserExistUseCase,
@@ -34,12 +30,6 @@ class AuthViewModel(
 ) : AndroidViewModel(application = application) {
     private val _state = MutableStateFlow<State>(getStateShow())
     val state = _state.asStateFlow()
-
-    private val _action = Channel<Action>(
-        capacity = Channel.BUFFERED,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST,
-    )
-    val action = _action.receiveAsFlow()
 
     private var isNewUser: Boolean? = null
 
@@ -57,7 +47,7 @@ class AuthViewModel(
         email: String
     ) {
         viewModelScope.launch {
-            _state.emit(State.Loading)
+            _state.value = State.Loading
             when (isNewUser) {
                 true -> {
                     registerUserUseCase(login, password, name, email).fold(
@@ -91,11 +81,13 @@ class AuthViewModel(
     }
 
     private fun openList() {
-        viewModelScope.launch { _action.send(Action.GoToList) }
+        viewModelScope.launch {
+            _state.value = getStateShow().copy(navigateToList = true)
+        }
     }
 
-    private suspend fun updateState(error: Throwable? = null) {
-        _state.emit(getStateShow(error))
+    private fun updateState(error: Throwable? = null) {
+        _state.value = getStateShow(error)
     }
 
     private fun getStateShow(error: Throwable? = null): State.Show {
@@ -112,13 +104,14 @@ class AuthViewModel(
                 null -> getApplication<Application>().getString(R.string.auth_next_button)
             },
             errorText = error?.toReadableMessage(getApplication()),
+            navigateToList = false
         )
     }
 
     fun checkAutoLogin() {
         viewModelScope.launch {
             if (authStorageDataSource.isLoggedIn()) {
-                _state.emit(State.Loading)
+                _state.value = State.Loading
                 autoLoginUseCase().fold(
                     onSuccess = { openList() },
                     onFailure = { error ->
@@ -130,7 +123,6 @@ class AuthViewModel(
         }
     }
 
-
     sealed interface State {
         data object Loading : State
         data class Show(
@@ -138,11 +130,8 @@ class AuthViewModel(
             val showPassword: Boolean,
             val buttonText: String,
             val errorText: String?,
+            val navigateToList: Boolean
         ) : State
-    }
-
-    sealed interface Action {
-        data object GoToList : Action
     }
 
     companion object {
