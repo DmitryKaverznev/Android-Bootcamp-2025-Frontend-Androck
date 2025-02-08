@@ -39,7 +39,7 @@ object AuthNetworkDataSource {
                 headers {
                     append(
                         HttpHeaders.Authorization,
-                        Credentials.basic("vol_vol", "admin")
+                        Credentials.basic(login, password)
                     )
                 }
             }
@@ -56,7 +56,7 @@ object AuthNetworkDataSource {
     suspend fun register(login: String, password: String, name: String, email: String): Result<Unit> =
         withContext(Dispatchers.IO) {
             runCatching {
-                val response = Network.client.get("$SERVER_ADDRESS/api/users/register") {
+                val response = Network.client.post("$SERVER_ADDRESS/api/users/register") {
                     contentType(ContentType.Application.Json)
                     setBody(
                         AuthRegisterDto(

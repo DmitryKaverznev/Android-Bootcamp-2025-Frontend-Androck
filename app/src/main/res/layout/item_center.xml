@@ -5,7 +5,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="8dp">
+    android:padding="8dp"
+    android:elevation="2dp"
+    android:outlineProvider="background"
+    android:background="@drawable/bg_rounded_white"
+    android:clipToPadding="false">
 
     <ImageButton
         android:id="@+id/actionButton"

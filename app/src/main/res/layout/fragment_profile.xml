@@ -1,24 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.profile.ProfileFragment">
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <!-- Кнопка редактирования -->
     <ImageButton
         android:id="@+id/editButton"
         android:layout_width="48dp"
         android:layout_height="48dp"
+        android:layout_margin="16dp"
         android:src="@drawable/ic_edit"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:padding="8dp"
-
         android:contentDescription="@string/common_edit"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="16dp"/>
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <!-- Кнопка выхода -->
+    <ImageButton
+        android:id="@+id/logoutButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_logout"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:padding="8dp"
+        android:contentDescription="@string/common_logout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <!-- Кнопка сохранения -->
+    <ImageButton
+        android:id="@+id/saveButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="16dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/ic_save"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:padding="8dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/profileContainer"
@@ -40,26 +77,14 @@
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <include
-            android:id="@+id/photoPhone"
-            layout="@layout/image_phone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="0dp"
-            android:scaleX="0.3"
-            android:scaleY="0.3"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/profileTitle" />
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/profileDetailsContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@id/photoPhone">
+            app:layout_constraintTop_toBottomOf="@id/profileTitle">
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/nameInputLayout"
@@ -73,18 +98,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@android:color/white"
-                    android:clickable="false"
-                    android:focusable="false"
-                    android:focusableInTouchMode="false"
                     android:hint="@string/profile_fullname_hint"
                     android:inputType="textPersonName"
-                    android:textColorHint="#757575"
-                    tools:ignore="TextContrastCheck" />
-
+                    android:textColorHint="#757575"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/phoneInputLayout"
+                android:id="@+id/loginInputLayout"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -92,18 +112,13 @@
                 app:layout_constraintTop_toBottomOf="@id/nameInputLayout">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/phoneEditText"
+                    android:id="@+id/loginEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@android:color/white"
-                    android:clickable="false"
-                    android:focusable="false"
-                    android:focusableInTouchMode="false"
-                    android:hint="@string/auth_phone_hint"
-                    android:inputType="phone"
-                    android:textColorHint="#757575"
-                    tools:ignore="TextContrastCheck" />
-
+                    android:hint="@string/auth_login_hint"
+                    android:inputType="text"
+                    android:textColorHint="#757575"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -112,44 +127,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                app:layout_constraintTop_toBottomOf="@id/phoneInputLayout">
+                app:layout_constraintTop_toBottomOf="@id/loginInputLayout">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/emailEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@android:color/white"
-                    android:clickable="false"
-                    android:focusable="false"
-                    android:focusableInTouchMode="false"
-                    android:hint="@string/auth_login_hint"
+                    android:hint="@string/auth_email_hint"
                     android:inputType="textEmailAddress"
-                    android:textColorHint="#757575"
-                    tools:ignore="TextContrastCheck" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/centerInputLayout"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:layout_constraintTop_toBottomOf="@id/emailInputLayout">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/centerEditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/white"
-                    android:clickable="false"
-                    android:focusable="false"
-                    android:focusableInTouchMode="false"
-                    android:hint="@string/profile_center_hint"
-                    android:inputType="text"
-                    android:textColorHint="#757575"
-                    tools:ignore="TextContrastCheck" />
-
+                    android:textColorHint="#757575"/>
             </com.google.android.material.textfield.TextInputLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>

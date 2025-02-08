@@ -69,5 +69,6 @@
     <string name="continue_button">Countine</string>
     <string name="auth_email_hint">Email</string>
     <string name="auth_name_hint">Full Name</string>
+    <string name="common_logout">Logout</string>
 
 </resources>

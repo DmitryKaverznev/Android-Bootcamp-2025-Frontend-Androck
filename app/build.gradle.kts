@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -72,10 +73,12 @@ dependencies {
     implementation(libs.androidx.paging.runtime.ktx)
 
     // Testing
-    testImplementation(libs.junit)  // Добавлено
-    androidTestImplementation(libs.androidx.test.ext.junit)  // Добавлено
-    androidTestImplementation(libs.androidx.test.espresso.core)  // Добавлено
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.androidx.test.espresso.core)
 
     // Debug
-    debugImplementation(libs.androidx.ui.tooling)  // Для Compose
+    debugImplementation(libs.androidx.ui.tooling)
+
+    implementation(libs.kotlinx.serialization.json)
 }

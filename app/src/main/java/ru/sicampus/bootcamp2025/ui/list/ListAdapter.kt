@@ -43,15 +43,15 @@ class ListAdapter(
 
                 coordinates.text = root.context.getString(
                     R.string.coordinates_format,
-                    item.coordinates.latitude,
-                    item.coordinates.longitude
+                    item.coordinateX.toDouble(),
+                    item.coordinateY.toDouble(),
                 )
 
                 val oneCenter = OneCenter(
-                    id = item.id,
                     name = item.name,
                     description = item.description,
-                    coordinates = item.coordinates
+                    coordinateX = item.coordinateX,
+                    coordinateY = item.coordinateY
                 )
 
                 binding.actionButton.setOnClickListener {
@@ -65,7 +65,7 @@ class ListAdapter(
 
     object UserDiff : DiffUtil.ItemCallback<ListEntity>() {
         override fun areItemsTheSame(oldItem: ListEntity, newItem: ListEntity): Boolean {
-            return oldItem.id == newItem.id
+            return oldItem.name == newItem.name
         }
 
         override fun areContentsTheSame(oldItem: ListEntity, newItem: ListEntity): Boolean {

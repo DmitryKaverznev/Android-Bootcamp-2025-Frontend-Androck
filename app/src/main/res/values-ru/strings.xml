@@ -64,4 +64,6 @@
     <string name="continue_button">Далее</string>
     <string name="auth_email_hint">Электронная почта</string>
     <string name="auth_name_hint">Полное имя</string>
+    <string name="common_logout">Выйти</string>
+
 </resources>

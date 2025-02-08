@@ -1,7 +1,4 @@
-package ru.sicampus.bootcamp2025.data.auth
-
-import ru.sicampus.bootcamp2025.data.save.PrefsKeys
-import ru.sicampus.bootcamp2025.data.save.PrefsManager
+package ru.sicampus.bootcamp2025.data.save
 
 class AuthStorageDataSource {
 

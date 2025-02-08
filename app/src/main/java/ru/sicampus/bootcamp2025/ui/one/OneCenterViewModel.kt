@@ -1,85 +1,79 @@
+// OneCenterViewModel.kt
 package ru.sicampus.bootcamp2025.ui.one
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import ru.sicampus.bootcamp2025.R
 import ru.sicampus.bootcamp2025.domain.one.OneCenter
-import ru.sicampus.bootcamp2025.domain.one.OneCenterRepository
-import ru.sicampus.bootcamp2025.domain.one.UserCenter
+import ru.sicampus.bootcamp2025.data.one.UserCenter
+import ru.sicampus.bootcamp2025.domain.one.GetUsersUseCase
+import ru.sicampus.bootcamp2025.domain.one.RegisterUserUseCase
+import ru.sicampus.bootcamp2025.utils.toReadableMessage
 
 class OneCenterViewModel(
-    private val repository: OneCenterRepository,
-    val oneCenter: OneCenter
-) : ViewModel() {
+    application: Application,
+    private val oneCenter: OneCenter, // Обязательный параметр
+    private val getUsersUseCase: GetUsersUseCase,
+    private val registerUserUseCase: RegisterUserUseCase
+) : AndroidViewModel(application) {
 
-    private val _state = MutableLiveData<State>(State.Loading)
-    val state: LiveData<State> = _state
+    private val _state = MutableStateFlow<State>(State.Loading)
+    val state = _state.asStateFlow()
 
-    init {
-        loadInitialData()
+    sealed class State {
+        data object Loading : State()
+        data class Loaded(val center: OneCenter, val volunteers: List<UserCenter>) : State()
+        data class Error(val message: String) : State()
     }
 
-    private fun loadInitialData() {
+    fun registerUser() {
         viewModelScope.launch {
             _state.value = State.Loading
-            loadUsers()
+            try {
+                // Явное приведение типа для userId
+                val success = registerUserUseCase().getOrThrow()
+                if (success) loadUsers()
+                else _state.value = State.Error(getApplication<Application>().getString(R.string.common_refresh))
+            } catch (e: Exception) {
+                _state.value = State.Error(e.toReadableMessage(getApplication()).toString())
+            }
         }
     }
 
-    fun registerUser(userId: Int) {
+    fun loadUsers() {
         viewModelScope.launch {
-            _state.value = State.Loading
-            repository.registerToCenter(userId).fold(
-                onSuccess = { success ->
-                    if (success) {
-                        loadUsers()
-                    } else {
-                        _state.value = State.Error("Registration failed")
-                    }
-                },
-                onFailure = { error ->
-                    _state.value = State.Error(error.toString())
-                }
-            )
+            try {
+                val users = getUsersUseCase().getOrThrow()
+                _state.value = State.Loaded(oneCenter, users)
+            } catch (e: Exception) {
+                _state.value = State.Error(e.toReadableMessage(getApplication()).toString())
+            }
         }
     }
 
-    private suspend fun loadUsers() {
-        repository.getAllUsers()
-            .fold(
-                onSuccess = { users ->
-                    _state.value = State.Loaded(
-                        center = oneCenter,
-                        volunteers = users,
-                        isLoading = false
-                    )
-                },
-                onFailure = { error ->
-                    _state.value = State.Error(error.toString())
-                }
-            )
-    }
-
-    sealed interface State {
-        data object Loading : State
-        data class Loaded(
-            val center: OneCenter,
-            val volunteers: List<UserCenter>,
-            val isLoading: Boolean
-        ) : State
-        data class Error(val message: String) : State
-    }
-
-    class OneCenterViewModelFactory(
-        private val oneCenter: OneCenter,
-        private val repository: OneCenterRepository
-    ) : ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return OneCenterViewModel(repository, oneCenter) as T
+    companion object {
+        fun factory(
+            oneCenter: OneCenter, // Обязательная передача центра
+            getUsersUseCase: GetUsersUseCase,
+            registerUserUseCase: RegisterUserUseCase
+        ) = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+                val app = extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as Application
+                return OneCenterViewModel(
+                    application = app,
+                    oneCenter = oneCenter, // Явная передача параметра
+                    getUsersUseCase = getUsersUseCase,
+                    registerUserUseCase = registerUserUseCase
+                ) as T
+            }
         }
     }
 }
